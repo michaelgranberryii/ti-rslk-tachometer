@@ -31,9 +31,9 @@
 #include "../inc/Motor.h"
 #include "../inc/Tachometer.h"
 
-#define MAIN_CONTROLLER 1
+//#define MAIN_CONTROLLER 1
 //#define TASK_1          1
-//#define TASK_2          1
+#define TASK_2          1
 
 // Initialize length of the tachometer buffers
 #define BUFFER_LENGTH                 10
@@ -125,7 +125,14 @@ uint8_t Done = 0;
  */
 void Timer_A1_Periodic_Task(void)
 {
-    // Your code for Task 1 goes here
+    if (Edge_Counter < 8){
+        P8->OUT ^= 1;
+        Done = 0;
+    }
+    else{
+        P8->OUT = 0;
+        Done = 1;
+    }
 }
 
 /**
@@ -136,7 +143,8 @@ void Timer_A1_Periodic_Task(void)
  */
 void Detect_Edge(uint16_t time)
 {
-    // Your code for Task 1 goes here
+    Edge_Counter++;
+    LED2_Output(RGB_LED_BLUE);
 }
 
 /**
@@ -252,6 +260,35 @@ uint16_t Average_of_Buffer(uint16_t *buffer, int buffer_length)
 
     buffer_average = buffer_sum / buffer_length;
     return buffer_average;
+}
+
+void go_straight () {
+    Motor_Forward(4400, 4500);
+}
+
+void turn() {
+    Motor_Forward(3500, 4500);
+}
+
+void task2() {
+    Clock_Delay1ms(1000);
+    LED2_Output(RGB_LED_RED);
+    go_straight();
+    Clock_Delay1ms(6000);
+
+    turn();
+    Clock_Delay1ms(3000);
+
+    go_straight();
+    Clock_Delay1ms(3000);
+
+    turn();
+    Clock_Delay1ms(4000);
+
+    go_straight();
+    Clock_Delay1ms(6000);
+
+    LED2_Output(RGB_LED_GREEN);
 }
 
 int main(void)
@@ -401,12 +438,16 @@ int main(void)
         #error "Only MAIN_CONTROLLER, TASK_1, or TASK_2 can be active at the same time."
     #endif
 
-        // Your code for Task 1 goes here
+        uint8_t button_status = Get_Buttons_Status();
+        if (button_status == 0x10){
+            Edge_Counter = 0;
+            Done = 0;
+            printf("RESETTING!");
+        }
         if (Done == 1)
         {
             printf("Edge Counter: %d\n", Edge_Counter);
             Clock_Delay1ms(200);
-
         }
 
 #elif defined TASK_2
@@ -414,7 +455,9 @@ int main(void)
         #error "Only MAIN_CONTROLLER, TASK_1, or TASK_2 can be active at the same time."
     #endif
 
-        // Your code for Task 2 goes here
+        task2();
+        Motor_Stop();
+        break;
 
 #else
     #error "Define either one of the options: MAIN_CONTROLLER, TASK_1, or TASK_2."
