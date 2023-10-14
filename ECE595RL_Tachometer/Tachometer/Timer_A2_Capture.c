@@ -24,7 +24,7 @@ void Timer_A2_Capture_Init(void(*task)(uint16_t time))
      TIMER_A2->CTL &= ~0x0030;
      TIMER_A2->CTL = 0x0200;
      TIMER_A2->CCTL[1] = 0x4910;
-     TIMER_A2->EX0 &= ~0x0000;
+     TIMER_A2->EX0 = 0x0000;
     // Set Interrupt Priority Level to 3
     NVIC->IP[3] = (NVIC->IP[3] & 0xFFFF0FFF) | 0x00006000;
     // Enable Interrupt 13 in NVIC
