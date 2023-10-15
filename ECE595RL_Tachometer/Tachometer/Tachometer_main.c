@@ -118,8 +118,11 @@ void Bumper_Sensors_Handler(uint8_t bumper_sensor_state)
 uint8_t Done = 0;
 
 /**
- * @brief
+ * @brief Toggles an output pin until eight edges are counted
  *
+ * This function checks an Edge Counter every time the timer A1 interrupt is fired (at 2 kHz).
+ * If the Edge Count is less than 8, the pin P8.0 is toggle and the "Done" flag is cleared.
+ * Otherwise, the functions sets a flag "Done" and clears the P8.0 pin. *
  *
  * @return None
  */
@@ -136,8 +139,10 @@ void Timer_A1_Periodic_Task(void)
 }
 
 /**
- * @brief
+ * @brief Timer A2 Capture task incrementing Edge Counter
  *
+ * This function is called by the Timer A2 Capture interrupt handler, which is fired on the rising edge of pin P8.0.
+ * The function increments the Edge Counter and sets the RGB LED to blue.
  *
  * @return None
  */
@@ -262,14 +267,41 @@ uint16_t Average_of_Buffer(uint16_t *buffer, int buffer_length)
     return buffer_average;
 }
 
+/**
+ * @brief Function to drive the robot forward
+ *
+ * This is a helper function to drive the robot forward by setting similar PWM duty cycle for the right and the left motors.
+ * Although in theory both duty cycles should be the same, the discrepancy in number is due to physical imperfections.
+ * The method of trial and error is used to generate these numbers based on the specific robot used.
+ *
+ * @return None
+ */
 void go_straight () {
     Motor_Forward(4400, 4500);
 }
 
+/**
+ * @brief Function to make the robot turn left
+ *
+ * This is a helper function to drive the robot left by setting high duty cycle to the right motor the the left motor.
+ * The method of trial and error is used to generate these numbers based on the specific robot used and the test path.
+ *
+ * @return None
+ */
 void turn() {
     Motor_Forward(3500, 4500);
 }
 
+/**
+ * @brief Function to make the robot complete a semi-circular path
+ *
+ * This function uses the helper functions go_straight() and turn() to drive the robot through a circular track.
+ * The delays used in the function are based on the track itself and are set using trial and error method.
+ * The function uses the red RGB LED to indicate that the robot hasn't reached the end yet. When the end is reached, the green RGB LED is used to indicate that.
+
+ *
+ * @return None
+ */
 void task2() {
     Clock_Delay1ms(1000);
     LED2_Output(RGB_LED_RED);
