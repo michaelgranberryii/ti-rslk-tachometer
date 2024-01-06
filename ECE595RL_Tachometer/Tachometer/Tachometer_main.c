@@ -13,7 +13,7 @@
  *  - Timer A3: Used for input capture to request interrupts on the rising edge of P10.4 and P10.5
  *              and to calculate the period between captures
  *
- * @author Aaron Nanas
+ * @author Michael Granberry, Abdullah Hendy, Aaron Nanas
  *
  */
 
